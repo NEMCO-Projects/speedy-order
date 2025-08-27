@@ -115,6 +115,8 @@ Run in **CMD**:
    * ✅ **Web development build tools**
 
 ---
+### Note : Download link
+https://aka.ms/vs/17/release/vs_BuildTools.exe
 
 ## 🔟 Build the Database Project
 
