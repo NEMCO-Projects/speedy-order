@@ -244,6 +244,17 @@ This allows the app to connect securely to the database.
 </connectionStrings>
 ```
 
+<!-- Web.Config Configuration File -->
+
+### Check this also in web.config
+```
+<configuration>
+    <system.web>
+        <customErrors mode="Off"/>
+    </system.web>
+</configuration>
+
+```       
 Make sure the server name (`.\SQLSEVER`) is correct. You might need to change it to `.\SQLEXPRESS` or your actual SQL instance name.
 
 ---
