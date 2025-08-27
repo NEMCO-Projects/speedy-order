@@ -45,6 +45,11 @@ Install-WindowsFeature Web-Server,Web-Common-Http,Web-Default-Doc,Web-Static-Con
 
 Open **Command Prompt (CMD)** and run:
 
+**Create sites folder in C:\***
+```cmd
+mkdir C:\sites
+```
+
 ```cmd
 cd C:\sites
 git clone https://github.com/NEMCO-Projects/speedy-order.git
