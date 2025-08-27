@@ -1,0 +1,49 @@
+trigger:
+- main
+
+pool:
+  name: Default  # Use the name of your self-hosted agent pool
+
+variables:
+  solution: '**/*.sln'
+  buildPlatform: 'Any CPU'
+  buildConfiguration: 'Release'
+  siteFolder: 'C:\sites\speedy-order'
+
+steps:
+# Optional: Clean site folder before build (careful!)
+# - powershell: Remove-Item -Recurse -Force -Path "$(siteFolder)\*"
+#   displayName: 'Clean site folder'
+
+- task: NuGetToolInstaller@1
+
+- task: NuGetCommand@2
+  inputs:
+    restoreSolution: '$(solution)'
+
+- task: VSBuild@1
+  inputs:
+    solution: '$(solution)'
+    msbuildArgs: '/p:Configuration=$(buildConfiguration)'
+    platform: '$(buildPlatform)'
+    configuration: '$(buildConfiguration)'
+
+# Stop IIS site before deployment
+- powershell: |
+    Import-Module WebAdministration
+    Stop-Website -Name "speedy-order"
+  displayName: 'Stop IIS Website'
+
+# Copy files to IIS site folder
+- task: CopyFiles@2
+  inputs:
+    SourceFolder: '$(Build.SourcesDirectory)'
+    Contents: '**\*'
+    TargetFolder: '$(siteFolder)'
+  displayName: 'Copy site files to IIS folder'
+
+# Start IIS site after deployment
+- powershell: |
+    Import-Module WebAdministration
+    Start-Website -Name "speedy-order"
+  displayName: 'Start IIS Website'
