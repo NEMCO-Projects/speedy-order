@@ -168,11 +168,6 @@ You should now see the **Speedy Order Application** 🎉
 
 ---
 
-
-
-
-Got it! Here's the **step-by-step guide** for setting up the SpeedyOrder project — **without Markdown formatting** — and explained clearly from start to finish, assuming you're new to this or moving slowly. Each section builds on the previous one.
-
 ---
 
 **SpeedyOrder Setup Guide (Step-by-Step)**
