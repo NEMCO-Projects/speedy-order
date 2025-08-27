@@ -168,64 +168,75 @@ You should now see the **Speedy Order Application** 🎉
 
 ---
 
-````md
-# SpeedyOrder Sql Server Setup Guide
 
-This guide will help you set up the **SpeedyOrder** project with sql server on your local machine step-by-step.
 
----
 
-## ✅ Prerequisites
-
-Make sure you have the following installed:
-
-- SQL Server Express (with SQL Server Management Studio - SSMS)
-- Visual Studio 2022 Build Tools
-- IIS (Internet Information Services)
-- PowerShell
-- .NET Framework v4.0.30319
+Got it! Here's the **step-by-step guide** for setting up the SpeedyOrder project — **without Markdown formatting** — and explained clearly from start to finish, assuming you're new to this or moving slowly. Each section builds on the previous one.
 
 ---
 
-## 1. Create the Database
+**SpeedyOrder Setup Guide (Step-by-Step)**
 
-### ➤ Step 1: Open SSMS (SQL Server Management Studio)
+---
 
-Run the following script to create the database:
+**✅ Prerequisites (Install These First)**
 
-```sql
+Before starting, make sure you have the following installed on your computer:
+
+1. **SQL Server Express** and **SQL Server Management Studio (SSMS)**
+2. **Visual Studio 2022 Build Tools**
+3. **IIS (Internet Information Services)**
+4. **PowerShell** (already included in Windows)
+5. **.NET Framework version 4.0.30319**
+
+---
+
+**Step 1: Create the Database**
+
+1. Open **SQL Server Management Studio (SSMS)**.
+2. Connect to your local server (usually named something like `.\SQLEXPRESS`).
+3. In the query window, paste the following and execute:
+
+```
 CREATE DATABASE SpeedyOrder;
 GO
-````
+```
+
+This will create the database needed for the project.
 
 ---
 
-## 2. Import the Database Schema
+**Step 2: Load the Database Schema**
 
-### ➤ Step 2: Open the `Database.sql` file from the repo and execute it against the `SpeedyOrder` database.
+1. Find the file called **Database.sql** inside the project repo.
+2. Open that file in SSMS.
+3. Make sure you're connected to the **SpeedyOrder** database.
+4. Run the script to create tables and insert necessary data.
 
 ---
 
-## 3. Create SQL Login and User
+**Step 3: Create a SQL Login and User**
 
-Run the following in SSMS:
+Run the following SQL code in SSMS to create a user that the application will use:
 
-```sql
+```
 CREATE LOGIN speedyuser WITH PASSWORD = 'ChangeThisStrong#P@ss1';
 USE SpeedyOrder;
 CREATE USER speedyuser FOR LOGIN speedyuser;
 EXEC sp_addrolemember 'db_owner', 'speedyuser';
 ```
 
+This allows the app to connect securely to the database.
+
 ---
 
-## 4. Update Connection String in Web Config
+**Step 4: Update the Web.config File**
 
-### ➤ Step 4: Edit `C:\sites\speedy-order\Web.config`
+1. Open the file located at `C:\sites\speedy-order\Web.config`
+2. Look for the `<connectionStrings>` section.
+3. Replace it with the following:
 
-Look for `<connectionStrings>` and update it as follows:
-
-```xml
+```
 <connectionStrings>
   <add name="MyConnectionString"
        connectionString="Server=.\SQLSEVER;Database=SpeedyOrder;User ID=speedyuser;Password=ChangeThisStrong#P@ss1;MultipleActiveResultSets=true"
@@ -233,60 +244,68 @@ Look for `<connectionStrings>` and update it as follows:
 </connectionStrings>
 ```
 
-✅ Make sure the server name (`.\SQLSEVER`) is correct for your SQL Server instance.
+Make sure the server name (`.\SQLSEVER`) is correct. You might need to change it to `.\SQLEXPRESS` or your actual SQL instance name.
 
 ---
 
-## 5. Enable SQL Server Network Access
+**Step 5: Enable SQL Server Network Access**
 
-### ➤ Step 5: Open **SQL Server Configuration Manager**
+This step ensures IIS can connect to SQL Server.
 
-Navigate to:
+1. Open **SQL Server Configuration Manager**.
+2. Go to:
 
-**SQL Server Network Configuration → Protocols for SQLEXPRESS**
+   * SQL Server Network Configuration → Protocols for `SQLEXPRESS`
+3. Enable:
 
-* Enable **TCP/IP**
-* Enable **Named Pipes**
-
-➡ Restart SQL Server Service after enabling.
+   * **TCP/IP**
+   * **Named Pipes**
+4. Restart the **SQL Server (SQLEXPRESS)** service.
 
 ---
 
-## 6. Allow Firewall Access
+**Step 6: Allow SQL Server Through Windows Firewall**
 
-### ➤ Step 6: Run the following PowerShell command:
+Open **PowerShell as Administrator** and run:
 
-```powershell
+```
 netsh advfirewall firewall add rule name="SQL Server" dir=in action=allow protocol=TCP localport=1433
 ```
 
+This allows SQL traffic on port 1433 through the firewall.
+
 ---
 
-## 7. Restart IIS
+**Step 7: Restart IIS**
 
-### ➤ Step 7: In PowerShell, run:
+Still in PowerShell, run this command:
 
-```powershell
+```
 iisreset
 ```
 
+This restarts IIS to apply changes.
+
 ---
 
-## 8. Build the Project
+**Step 8: Build the Database Project**
 
-### ➤ Step 8: In **Command Prompt**, run:
+1. Open **Command Prompt** (not PowerShell).
+2. Run the following command to build the project:
 
-```cmd
+```
 "C:\Program Files (x86)\Microsoft Visual Studio\2022\BuildTools\MSBuild\Current\Bin\MSBuild.exe" "C:\sites\speedy-order\DatabaseProject.csproj" /p:Configuration=Release
 ```
 
+Make sure the file path matches where your project is located.
+
 ---
 
-## 9. Precompile ASP.NET Website
+**Step 9: Precompile the ASP.NET Website**
 
-### ➤ Step 9: In **PowerShell**, run:
+In **PowerShell**, run the following command:
 
-```powershell
+```
 & $env:WINDIR\Microsoft.NET\Framework64\v4.0.30319\aspnet_compiler.exe `
   -p "C:\sites\speedy-order" `
   -v / `
@@ -294,16 +313,17 @@ iisreset
   "C:\sites\speedy-order_precompiled"
 ```
 
----
-
-## ✅ Done!
-
-Your SpeedyOrder project should now be set up and ready to run.
-
-If anything breaks, double-check:
-
-* The database name and login credentials.
-* IIS is running.
-* SQL Server is accepting remote connections on port 1433.
+This precompiles the website and prepares it for deployment.
 
 ---
+
+**🎉 You're Done!**
+
+Your SpeedyOrder project should now be set up and ready to use. If you run into issues:
+
+* Double-check that SQL Server is running and accepting connections
+* Make sure IIS is started
+* Verify your Web.config connection string
+* Ensure the firewall rule was added correctly
+
+Let me know if you need help with any specific step.
