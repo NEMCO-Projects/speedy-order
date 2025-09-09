@@ -2,7 +2,7 @@ trigger:
 - main
 
 pool:
-  name: Default  # Your self-hosted agent
+  name: My  # Your self-hosted agent
 
 variables:
   solution: '**/*.sln'
@@ -47,7 +47,31 @@ steps:
     TargetFolder: '$(siteFolder)'
   displayName: 'Copy new site files to IIS folder'
 
-# Step 6: Start the IIS site again
+# Step 6: Add WebForm1.aspx to IIS Default Documents
+- powershell: |
+    Import-Module WebAdministration
+
+    $siteName = "speedy-order"
+    $defaultDocPath = "IIS:\Sites\$siteName\defaultDocument\files"
+
+    # Get existing default documents
+    $existingDefaults = Get-WebConfigurationProperty -pspath "IIS:\Sites\$siteName" -filter "system.webServer/defaultDocument/files" -name "." | Select-Object -ExpandProperty value
+
+    # Optional: Clear all existing default documents (uncomment the next 3 lines if you want WebForm1.aspx to be the only one)
+    # Clear-WebConfiguration -pspath "IIS:\Sites\$siteName" -filter "system.webServer/defaultDocument/files"
+    # Write-Host "Cleared existing default documents"
+    # Add-WebConfigurationProperty -pspath "IIS:\Sites\$siteName" -filter "system.webServer/defaultDocument/files" -name "." -value @{value="WebForm1.aspx"}
+
+    # If WebForm1.aspx is not already in the list, add it
+    if ($existingDefaults -notcontains "WebForm1.aspx") {
+        Add-WebConfigurationProperty -pspath "IIS:\Sites\$siteName" -filter "system.webServer/defaultDocument/files" -name "." -value @{value="WebForm1.aspx"}
+        Write-Host "Added WebForm1.aspx to Default Documents"
+    } else {
+        Write-Host "WebForm1.aspx is already in the Default Documents list"
+    }
+  displayName: 'Add WebForm1.aspx to IIS Default Documents'
+
+# Step 7: Start the IIS site again
 - powershell: |
     Import-Module WebAdministration
     Start-Website -Name "speedy-order"
