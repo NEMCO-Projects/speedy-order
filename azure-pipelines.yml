@@ -52,22 +52,25 @@ steps:
     Import-Module WebAdministration
 
     $siteName = "speedy-order"
-    $defaultDocPath = "IIS:\Sites\$siteName\defaultDocument\files"
+    $defaultDocs = Get-WebConfigurationProperty -pspath "IIS:\Sites\$siteName" `
+        -filter "system.webServer/defaultDocument/files" -name "."
 
-    # Get existing default documents
-    $existingDefaults = Get-WebConfigurationProperty -pspath "IIS:\Sites\$siteName" -filter "system.webServer/defaultDocument/files" -name "." | Select-Object -ExpandProperty value
+    $exists = $false
 
-    # Optional: Clear all existing default documents (uncomment the next 3 lines if you want WebForm1.aspx to be the only one)
-    # Clear-WebConfiguration -pspath "IIS:\Sites\$siteName" -filter "system.webServer/defaultDocument/files"
-    # Write-Host "Cleared existing default documents"
-    # Add-WebConfigurationProperty -pspath "IIS:\Sites\$siteName" -filter "system.webServer/defaultDocument/files" -name "." -value @{value="WebForm1.aspx"}
+    foreach ($doc in $defaultDocs) {
+        if ($doc.Value -eq "WebForm1.aspx") {
+            $exists = $true
+            break
+        }
+    }
 
-    # If WebForm1.aspx is not already in the list, add it
-    if ($existingDefaults -notcontains "WebForm1.aspx") {
-        Add-WebConfigurationProperty -pspath "IIS:\Sites\$siteName" -filter "system.webServer/defaultDocument/files" -name "." -value @{value="WebForm1.aspx"}
-        Write-Host "Added WebForm1.aspx to Default Documents"
+    if (-not $exists) {
+        Add-WebConfigurationProperty -pspath "IIS:\Sites\$siteName" `
+            -filter "system.webServer/defaultDocument/files" `
+            -name "." -value @{value="WebForm1.aspx"}
+        Write-Host "✅ Added WebForm1.aspx to Default Documents"
     } else {
-        Write-Host "WebForm1.aspx is already in the Default Documents list"
+        Write-Host "ℹ️ WebForm1.aspx is already in Default Documents"
     }
   displayName: 'Add WebForm1.aspx to IIS Default Documents'
 
